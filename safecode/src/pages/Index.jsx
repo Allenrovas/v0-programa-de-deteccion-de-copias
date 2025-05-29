@@ -1,20 +1,11 @@
-import React, { useState } from 'react';
-import Presentation from '../components/Presentation';
+import Presentation from "../components/Presentation"
 
-function Index() {
-  const [theme, setTheme] = useState('autumn');
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'autumn' ? 'dracula' : 'autumn';
-    setTheme(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-  };
-
+function Index({ theme, toggleTheme }) {
   return (
     <div className="App">
-      <Presentation />
+      <Presentation theme={theme} toggleTheme={toggleTheme} />
     </div>
-  );
+  )
 }
 
-export default Index;
+export default Index
