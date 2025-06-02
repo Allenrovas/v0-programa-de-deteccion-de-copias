@@ -55,6 +55,8 @@ async def upload_files(
     if language not in ["python", "java", "cpp", "javascript"]:
         raise HTTPException(status_code=400, detail="Lenguaje no soportado")
     
+    print(f"Recibidos {len(files)} archivos para el lenguaje: {language}")
+
     # Create unique directory for this session using pathlib
     session_id = str(uuid.uuid4())
     session_dir = Path(UPLOAD_DIR) / "plagiarism_checker" / session_id

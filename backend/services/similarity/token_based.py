@@ -1,6 +1,7 @@
 import numpy as np
 from difflib import SequenceMatcher
 from collections import Counter
+import Levenshtein
 
 class TokenBasedSimilarity:
     """
@@ -61,6 +62,22 @@ class TokenBasedSimilarity:
         # Coeficiente de Jaccard: intersección / unión
         return 2 * common_ngrams / total_ngrams if total_ngrams > 0 else 0
     
+    def levenshtein_similarity(self, tokens1, tokens2):
+        """
+        Calcula similitud usando distancia de Levenshtein normalizada
+        """
+        # Convertir tokens a strings para usar Levenshtein
+        str1 = ' '.join(str(t) for t in tokens1)
+        str2 = ' '.join(str(t) for t in tokens2)
+        
+        # Calcular distancia
+        distance = Levenshtein.distance(str1, str2)
+        max_len = max(len(str1), len(str2))
+        
+        # Normalizar a similitud (1 - distancia_normalizada)
+        similarity = 1 - (distance / max_len) if max_len > 0 else 0
+        return similarity
+    
     def winnowing_similarity(self, tokens1, tokens2, k=5, w=10):
         """
         Implementa el algoritmo Winnowing para detección de similitud
@@ -69,7 +86,7 @@ class TokenBasedSimilarity:
         """
         # Función hash para k-gramas
         def hash_kgram(kgram):
-            return hash(''.join(kgram)) & 0xffffffff
+            return hash(''.join(str(k) for k in kgram)) & 0xffffffff
         
         # Generar fingerprints usando Winnowing
         def get_fingerprints(tokens, k, w):
@@ -117,6 +134,7 @@ class TokenBasedSimilarity:
         lcs_sim = self.longest_common_subsequence(tokens1, tokens2)
         seq_sim = self.sequence_matcher_similarity(tokens1, tokens2)
         ngram_sim = self.n_gram_similarity(tokens1, tokens2)
+        lev_sim = self.levenshtein_similarity(tokens1, tokens2)
         
         # Si hay suficientes tokens, usar también Winnowing
         if len(tokens1) >= 5 and len(tokens2) >= 5:
@@ -125,7 +143,7 @@ class TokenBasedSimilarity:
             win_sim = 0
         
         # Combinar los resultados (ponderación ajustable)
-        combined_sim = 0.25 * lcs_sim + 0.25 * seq_sim + 0.25 * ngram_sim + 0.25 * win_sim
+        combined_sim = 0.2 * lcs_sim + 0.2 * seq_sim + 0.2 * ngram_sim + 0.2 * win_sim + 0.2 * lev_sim
         
         return combined_sim
     
@@ -142,15 +160,17 @@ class TokenBasedSimilarity:
                 similar_fragments.append({
                     "fragment1": (0, len(tokens1)),
                     "fragment2": (0, len(tokens2)),
-                    "similarity": similarity
+                    "similarity": similarity,
+                    "tokens1": tokens1,
+                    "tokens2": tokens2
                 })
             return similar_fragments
         
         # Usar ventana deslizante para encontrar fragmentos similares
-        for i in range(0, len(tokens1) - window_size + 1, window_size // 2):
+        for i in range(0, len(tokens1) - window_size + 1, max(1, window_size // 4)):  # Solapamiento del 75%
             window1 = tokens1[i:i+window_size]
             
-            for j in range(0, len(tokens2) - window_size + 1, window_size // 2):
+            for j in range(0, len(tokens2) - window_size + 1, max(1, window_size // 4)):
                 window2 = tokens2[j:j+window_size]
                 
                 similarity = self.calculate_similarity(window1, window2)
@@ -159,11 +179,31 @@ class TokenBasedSimilarity:
                     similar_fragments.append({
                         "fragment1": (i, i + window_size),
                         "fragment2": (j, j + window_size),
-                        "similarity": similarity
+                        "similarity": similarity,
+                        "tokens1": window1,
+                        "tokens2": window2
                     })
         
         # Fusionar fragmentos superpuestos
         return self._merge_overlapping_fragments(similar_fragments)
+    
+    def find_exact_matches(self, tokens1, tokens2, min_length=5):
+        """
+        Encuentra coincidencias exactas de secuencias de tokens
+        """
+        matches = []
+        matcher = SequenceMatcher(None, tokens1, tokens2)
+        
+        for match in matcher.get_matching_blocks():
+            if match.size >= min_length:
+                matches.append({
+                    "fragment1": (match.a, match.a + match.size),
+                    "fragment2": (match.b, match.b + match.size),
+                    "length": match.size,
+                    "tokens": tokens1[match.a:match.a + match.size]
+                })
+        
+        return matches
     
     def _merge_overlapping_fragments(self, fragments):
         """
@@ -193,7 +233,9 @@ class TokenBasedSimilarity:
                         previous["fragment2"][0],
                         max(previous["fragment2"][1], current["fragment2"][1])
                     ),
-                    "similarity": max(previous["similarity"], current["similarity"])
+                    "similarity": max(previous["similarity"], current["similarity"]),
+                    "tokens1": previous["tokens1"],  # Mantener los tokens del fragmento anterior
+                    "tokens2": previous["tokens2"]
                 }
             else:
                 merged.append(current)
