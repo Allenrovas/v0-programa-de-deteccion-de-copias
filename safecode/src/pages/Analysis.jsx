@@ -10,8 +10,12 @@ import {
   FileArchive,
   Trash2,
   ArrowRight,
+  GitCompare,
+  FileText,
+  Percent,
+  Info,
 } from "lucide-react"
-import api from "../service/api"
+import api from "../service/api" // Asegúrate que la ruta a tu servicio api sea correcta
 
 function Analysis({ theme }) {
   const [language, setLanguage] = useState("")
@@ -21,6 +25,7 @@ function Analysis({ theme }) {
   const [modalMessage, setModalMessage] = useState("")
   const [modalType, setModalType] = useState("info") // 'info', 'success', 'error'
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [analysisResults, setAnalysisResults] = useState(null) // State for results
 
   const isDark = theme === "dracula"
 
@@ -49,17 +54,15 @@ function Analysis({ theme }) {
     }
 
     setIsSubmitting(true)
+    setAnalysisResults(null) // Clear previous results
 
     try {
-      // Crea un FormData con todos los archivos y el lenguaje seleccionado
       const formData = new FormData()
-      formData.append("language", language) // Lenguaje al FormData
+      formData.append("language", language)
       files.forEach((file) => {
-        formData.append("files", file) // Se agrega cada archivo al FormData
-        console.log("Archivo:", file.name)
+        formData.append("files", file)
       })
 
-      // Enviar el FormData al backend
       const response = await api.post("/upload/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -67,13 +70,23 @@ function Analysis({ theme }) {
       })
 
       console.log("Respuesta del servidor:", response.data)
-      setModalMessage("Archivos subidos exitosamente. El análisis ha comenzado.")
-      setModalType("success")
+      if (response.data && response.data.result_summary) {
+        setAnalysisResults(response.data.result_summary)
+        setModalMessage("Análisis completado. Revisa los resultados a continuación.")
+        setModalType("success")
+      } else {
+        setModalMessage("El análisis se completó, pero no se recibieron resultados detallados.")
+        setModalType("info")
+      }
       setIsModalOpen(true)
       setIsSubmitting(false)
+      // setFiles([]);
+      // setFileNames([]);
     } catch (error) {
       console.error("Error al subir los archivos:", error)
-      setModalMessage("Ocurrió un error al subir los archivos. Por favor, inténtalo de nuevo.")
+      setModalMessage(
+        `Ocurrió un error al subir los archivos: ${error.response?.data?.detail || error.message}. Por favor, inténtalo de nuevo.`,
+      )
       setModalType("error")
       setIsModalOpen(true)
       setIsSubmitting(false)
@@ -87,6 +100,11 @@ function Analysis({ theme }) {
     },
     multiple: true,
   })
+
+  // Helper to format similarity percentage
+  const formatSimilarity = (similarity) => {
+    return (similarity * 100).toFixed(2)
+  }
 
   return (
     <div
@@ -143,59 +161,31 @@ function Analysis({ theme }) {
             >
               <h2 className={`text-2xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>Cómo Funciona</h2>
               <div className="space-y-6">
-                <div className="flex items-start">
-                  <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                      isDark ? "bg-blue-600" : "bg-blue-500"
-                    }`}
-                  >
-                    1
+                {[
+                  { title: "Selecciona el Lenguaje", desc: "Elige el lenguaje de programación de tus proyectos." },
+                  {
+                    title: "Carga los Archivos",
+                    desc: "Sube al menos dos archivos ZIP que contengan los proyectos a comparar.",
+                  },
+                  {
+                    title: "Revisa los Resultados",
+                    desc: "El sistema procesará los archivos y mostrará un informe detallado de similitudes.",
+                  },
+                ].map((step, index) => (
+                  <div className="flex items-start" key={index}>
+                    <div
+                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                        isDark ? "bg-blue-600" : "bg-blue-500"
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <div className="ml-4">
+                      <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>{step.title}</h3>
+                      <p className={isDark ? "text-gray-300" : "text-gray-600"}>{step.desc}</p>
+                    </div>
                   </div>
-                  <div className="ml-4">
-                    <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-                      Selecciona el Lenguaje
-                    </h3>
-                    <p className={isDark ? "text-gray-300" : "text-gray-600"}>
-                      Elige el lenguaje de programación de tus proyectos.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                      isDark ? "bg-blue-600" : "bg-blue-500"
-                    }`}
-                  >
-                    2
-                  </div>
-                  <div className="ml-4">
-                    <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-                      Carga los Archivos
-                    </h3>
-                    <p className={isDark ? "text-gray-300" : "text-gray-600"}>
-                      Sube al menos dos archivos ZIP que contengan los proyectos a comparar.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                      isDark ? "bg-blue-600" : "bg-blue-500"
-                    }`}
-                  >
-                    3
-                  </div>
-                  <div className="ml-4">
-                    <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-                      Revisa los Resultados
-                    </h3>
-                    <p className={isDark ? "text-gray-300" : "text-gray-600"}>
-                      El sistema procesará los archivos y mostrará un informe detallado de similitudes.
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -206,38 +196,36 @@ function Analysis({ theme }) {
                 Lenguajes Soportados
               </h3>
               <div className="grid grid-cols-2 gap-3">
-                <div
-                  className={`p-3 rounded-lg flex items-center ${
-                    isDark ? "bg-gray-700 text-blue-400" : "bg-blue-50 text-blue-700"
-                  }`}
-                >
-                  <FileCode className="w-5 h-5 mr-2" />
-                  <span>Python</span>
-                </div>
-                <div
-                  className={`p-3 rounded-lg flex items-center ${
-                    isDark ? "bg-gray-700 text-green-400" : "bg-green-50 text-green-700"
-                  }`}
-                >
-                  <FileCode className="w-5 h-5 mr-2" />
-                  <span>Java</span>
-                </div>
-                <div
-                  className={`p-3 rounded-lg flex items-center ${
-                    isDark ? "bg-gray-700 text-purple-400" : "bg-purple-50 text-purple-700"
-                  }`}
-                >
-                  <FileCode className="w-5 h-5 mr-2" />
-                  <span>C++</span>
-                </div>
-                <div
-                  className={`p-3 rounded-lg flex items-center ${
-                    isDark ? "bg-gray-700 text-amber-400" : "bg-amber-50 text-amber-700"
-                  }`}
-                >
-                  <FileCode className="w-5 h-5 mr-2" />
-                  <span>JavaScript</span>
-                </div>
+                {[
+                  {
+                    name: "Python",
+                    colorClass: isDark ? "text-blue-400" : "text-blue-700",
+                    bgClass: isDark ? "bg-gray-700" : "bg-blue-50",
+                  },
+                  {
+                    name: "Java",
+                    colorClass: isDark ? "text-green-400" : "text-green-700",
+                    bgClass: isDark ? "bg-gray-700" : "bg-green-50",
+                  },
+                  {
+                    name: "C++",
+                    colorClass: isDark ? "text-purple-400" : "text-purple-700",
+                    bgClass: isDark ? "bg-gray-700" : "bg-purple-50",
+                  },
+                  {
+                    name: "JavaScript",
+                    colorClass: isDark ? "text-amber-400" : "text-amber-700",
+                    bgClass: isDark ? "bg-gray-700" : "bg-amber-50",
+                  },
+                ].map((lang) => (
+                  <div
+                    key={lang.name}
+                    className={`p-3 rounded-lg flex items-center ${lang.bgClass} ${lang.colorClass}`}
+                  >
+                    <FileCode className="w-5 h-5 mr-2" />
+                    <span>{lang.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -356,8 +344,10 @@ function Analysis({ theme }) {
                   disabled={isSubmitting}
                   className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center ${
                     isSubmitting
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                      ? isDark
+                        ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : `bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white`
                   }`}
                 >
                   {isSubmitting ? (
@@ -377,6 +367,154 @@ function Analysis({ theme }) {
           </div>
         </div>
       </div>
+
+      {/* Results Section */}
+      {analysisResults && (
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-10 text-center ${isDark ? "text-white" : "text-gray-900"}`}>
+            Resultados del Análisis
+          </h2>
+
+          <div
+            className={`rounded-2xl p-6 md:p-8 border mb-8 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} shadow-lg`}
+          >
+            <h3 className={`text-xl font-semibold mb-4 flex items-center ${isDark ? "text-white" : "text-gray-900"}`}>
+              <Info className="w-6 h-6 mr-3 text-blue-500" />
+              Resumen General
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+              <p className={isDark ? "text-gray-300" : "text-gray-700"}>
+                <strong>Lenguaje:</strong> {analysisResults.language}
+              </p>
+              <p className={isDark ? "text-gray-300" : "text-gray-700"}>
+                <strong>Proyectos Analizados:</strong> {analysisResults.num_submissions}
+              </p>
+              <p className={isDark ? "text-gray-300" : "text-gray-700"}>
+                <strong>Archivos Analizados:</strong> {analysisResults.num_files_analyzed}
+              </p>
+              <p className={isDark ? "text-gray-300" : "text-gray-700"}>
+                <strong>Umbral Similitud:</strong> {formatSimilarity(analysisResults.similarity_threshold)}%
+              </p>
+              <p className={isDark ? "text-gray-300" : "text-gray-700"}>
+                <strong>Umbral Fragmento:</strong> {formatSimilarity(analysisResults.fragment_threshold)}%
+              </p>
+            </div>
+          </div>
+
+          {analysisResults.similarity_results && analysisResults.similarity_results.length > 0 ? (
+            analysisResults.similarity_results.map((submissionPair, pairIndex) => (
+              <div
+                key={pairIndex}
+                className={`rounded-2xl p-6 md:p-8 border mb-8 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} shadow-lg`}
+              >
+                <h3
+                  className={`text-2xl font-semibold mb-2 flex items-center ${isDark ? "text-white" : "text-gray-900"}`}
+                >
+                  <GitCompare className="w-7 h-7 mr-3 text-purple-500" />
+                  {submissionPair.submission1} <span className="mx-2 text-gray-500">vs</span>{" "}
+                  {submissionPair.submission2}
+                </h3>
+                <div className="flex items-center mb-4">
+                  <Percent
+                    className={`w-5 h-5 mr-2 ${submissionPair.max_similarity > 0.7 ? "text-red-500" : submissionPair.max_similarity > 0.4 ? "text-yellow-500" : "text-green-500"}`}
+                  />
+                  <span className={`font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    Similitud Máxima: {formatSimilarity(submissionPair.max_similarity)}%
+                  </span>
+                  {submissionPair.is_plagiarism && (
+                    <span className="ml-3 text-xs font-semibold px-2 py-1 bg-red-500 text-white rounded-full">
+                      Plagio Detectado
+                    </span>
+                  )}
+                </div>
+
+                {submissionPair.similar_files && submissionPair.similar_files.length > 0 ? (
+                  submissionPair.similar_files.map((filePair, fileIndex) => (
+                    <div
+                      key={fileIndex}
+                      className={`rounded-xl p-4 mt-4 border ${isDark ? "bg-gray-700/50 border-gray-600" : "bg-gray-50 border-gray-200"}`}
+                    >
+                      <h4
+                        className={`text-lg font-medium mb-3 flex items-center ${isDark ? "text-gray-200" : "text-gray-800"}`}
+                      >
+                        <FileText className="w-5 h-5 mr-2 text-blue-500" />
+                        {filePair.file1} <span className="mx-1 text-gray-500">vs</span> {filePair.file2}
+                      </h4>
+                      <div className="flex items-center mb-3">
+                        <Percent
+                          className={`w-4 h-4 mr-1 ${filePair.combined_similarity > 0.7 ? "text-red-400" : filePair.combined_similarity > 0.4 ? "text-yellow-400" : "text-green-400"}`}
+                        />
+                        <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                          Similitud Combinada: {formatSimilarity(filePair.combined_similarity)}%
+                        </span>
+                        {filePair.is_plagiarism && (
+                          <span className="ml-2 text-xs font-semibold px-1.5 py-0.5 bg-red-600 text-white rounded-full">
+                            Plagio
+                          </span>
+                        )}
+                      </div>
+
+                      {filePair.fragments && filePair.fragments.length > 0 ? (
+                        filePair.fragments.map((fragment, fragIndex) => (
+                          <div
+                            key={fragIndex}
+                            className={`mt-3 pt-3 border-t ${isDark ? "border-gray-600" : "border-gray-300"}`}
+                          >
+                            <p className={`text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                              Fragmento {fragIndex + 1} (Similitud: {formatSimilarity(fragment.similarity)}%)
+                            </p>
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <p className={`text-xs mb-1 font-mono ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+                                  {filePair.file1} (Fragmento)
+                                </p>
+                                <pre
+                                  className={`p-3 rounded-md text-xs overflow-x-auto ${isDark ? "bg-gray-900 text-gray-300" : "bg-gray-100 text-gray-800"} max-h-60`}
+                                >
+                                  <code>{fragment.code1 || "No se pudo reconstruir el fragmento."}</code>
+                                </pre>
+                              </div>
+                              <div>
+                                <p
+                                  className={`text-xs mb-1 font-mono ${isDark ? "text-purple-400" : "text-purple-600"}`}
+                                >
+                                  {filePair.file2} (Fragmento)
+                                </p>
+                                <pre
+                                  className={`p-3 rounded-md text-xs overflow-x-auto ${isDark ? "bg-gray-900 text-gray-300" : "bg-gray-100 text-gray-800"} max-h-60`}
+                                >
+                                  <code>{fragment.code2 || "No se pudo reconstruir el fragmento."}</code>
+                                </pre>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className={`text-sm italic ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                          No se encontraron fragmentos específicos para estos archivos.
+                        </p>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className={`text-sm italic mt-4 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                    No se encontraron archivos con similitudes detalladas para este par de proyectos.
+                  </p>
+                )}
+              </div>
+            ))
+          ) : (
+            <div
+              className={`rounded-2xl p-6 md:p-8 border ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} shadow-lg text-center`}
+            >
+              <Info className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-blue-400" : "text-blue-500"}`} />
+              <p className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                No se encontraron similitudes significativas en este análisis.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && (

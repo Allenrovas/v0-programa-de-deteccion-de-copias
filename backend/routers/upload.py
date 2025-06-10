@@ -12,7 +12,7 @@ from services.similarity import process_submissions
 router = APIRouter(prefix="/api/upload", tags=["upload"])
 
 # Use system temp directory instead of local uploads
-UPLOAD_DIR = tempfile.gettempdir()
+UPLOAD_DIR = tempfile.gettempdir() #backend\uploads
 
 def set_permissions_recursive(path):
     """Set read/write permissions recursively for all files and directories"""
