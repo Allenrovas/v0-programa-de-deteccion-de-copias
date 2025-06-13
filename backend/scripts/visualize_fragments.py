@@ -80,6 +80,7 @@ def visualize_fragments(results_file, output_dir, language):
             <p>Total de pares de entregas: {len(results.get('similarity_results', []))}</p>
         """)
         
+        print(f"Total de pares de entregas: {len(results.get('similarity_results', []))}")
         # Escribir pares de entregas
         for i, pair in enumerate(results.get('similarity_results', [])):
             index_file.write(f"""

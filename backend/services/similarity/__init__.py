@@ -1,7 +1,8 @@
-from services.similarity.processor import PlagiarismProcessor
-
+#from services.similarity.processor import PlagiarismProcessor
+from services.similarity.enhanced_processor import OptimizedPlagiarismProcessor
 # Crear una instancia global del procesador
-plagiarism_processor = PlagiarismProcessor()
+#plagiarism_processor = PlagiarismProcessor()
+plagiarism_processor = OptimizedPlagiarismProcessor()
 
 # Exportar la función de procesamiento
 async def process_submissions(submission_dirs, language, session_id):
