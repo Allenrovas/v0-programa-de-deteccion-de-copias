@@ -1,15 +1,14 @@
-#from services.similarity.processor import PlagiarismProcessor
-from services.similarity.enhanced_processor import OptimizedPlagiarismProcessor
-# Crear una instancia global del procesador
-#plagiarism_processor = PlagiarismProcessor()
-plagiarism_processor = OptimizedPlagiarismProcessor()
+from typing import List, Dict
 
-# Exportar la función de procesamiento
-async def process_submissions(submission_dirs, language, session_id):
+from .enhanced_processor import UltraFastPlagiarismProcessor as OptimizedPlagiarismProcessor
+
+
+async def process_submissions(submission_dirs: List[str], language: str, session_id: str) -> Dict:
     """
-    Procesa las entregas para detectar similitudes
+    Procesa las entregas usando el procesador ultra-optimizado
     """
-    return await plagiarism_processor.process_submissions(submission_dirs, language, session_id)
+    processor = OptimizedPlagiarismProcessor()
+    return await processor.process_submissions(submission_dirs, language, session_id)
 
 # Exportar función para añadir al ground truth
 def add_to_ground_truth(file1_path, file2_path, is_plagiarism, plagiarism_type="unknown", 

@@ -1,5 +1,6 @@
 import ast
 import tokenize
+import keyword 
 from io import BytesIO
 
 class PythonTokenizer:

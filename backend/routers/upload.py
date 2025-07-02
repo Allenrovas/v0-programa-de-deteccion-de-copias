@@ -8,6 +8,7 @@ from typing import List
 import shutil
 from services.extractor import extract_zip_files
 from services.similarity import process_submissions
+import time
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])
 
@@ -49,6 +50,7 @@ async def upload_files(
     files: List[UploadFile] = File(...),
     language: str = Form(...)
 ):
+    start_time = time.time()
     if not files or len(files) < 2:
         raise HTTPException(status_code=400, detail="Se requieren al menos dos archivos ZIP")
     
@@ -91,6 +93,13 @@ async def upload_files(
         # Process submissions
         result = await process_submissions(extracted_dirs, language, session_id)
         
+        processing_time = time.time() - start_time
+        print(f"Procesamiento completado en {processing_time:.2f} segundos")
+
+        # Actualizar el resultado con información de rendimiento
+        result["processing_time"] = processing_time
+        result["performance_optimized"] = True
+
         return {
             "session_id": session_id,
             "message": "Archivos procesados correctamente",
