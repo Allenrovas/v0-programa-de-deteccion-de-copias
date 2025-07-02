@@ -522,7 +522,7 @@ class UltraFastPlagiarismProcessor:
                     })
         
         comparison_time = time.time() - comparison_start
-        print(f"⚡ Comparaciones completadas en {comparison_time:.2f}s")
+        print(f"Comparaciones completadas en {comparison_time:.2f}s")
         print(f"Total: {total_comparisons}, Omitidas: {skipped_comparisons}, Sospechosas: {len(high_similarity_pairs)}")
         
         # Ordenar por similitud
@@ -532,7 +532,7 @@ class UltraFastPlagiarismProcessor:
         submission_similarities = self._group_by_submissions_fast(high_similarity_pairs)
         
         total_time = time.time() - start_time
-        print(f"🎉 Análisis completado en {total_time:.2f}s")
+        print(f"Análisis completado en {total_time:.2f}s")
         
         return {
             "session_id": session_id,
