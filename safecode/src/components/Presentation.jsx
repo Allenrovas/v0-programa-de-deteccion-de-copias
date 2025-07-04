@@ -106,7 +106,7 @@ function Presentation({ theme }) {
               : "bg-gradient-to-r from-blue-600/10 to-purple-600/10"
           }`}
         ></div>
-        <div className="relative max-w-7xl mx-auto px-6 py-16">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
               <Heart className="w-8 h-8 text-red-500 mr-3" />
@@ -118,7 +118,9 @@ function Presentation({ theme }) {
                 Proyecto Sin Fines de Lucro
               </span>
             </div>
-            <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>
+            <h1
+              className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}
+            >
               Sistema de Detección de{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Copias</span>
             </h1>
@@ -128,20 +130,20 @@ function Presentation({ theme }) {
               Herramienta gratuita y de código abierto que utiliza técnicas avanzadas para detectar similitudes en
               proyectos de programación, ayudando a instituciones educativas a mantener la integridad académica.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-                onClick={() => window.location.href = "/analysis"}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+              <button
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                onClick={() => (window.location.href = "/analysis")}
               >
                 Comenzar
               </button>
               <button
-                className={`border-2 border-blue-600 font-semibold py-3 px-8 rounded-lg transition-all duration-300 ${
+                className={`w-full sm:w-auto border-2 border-blue-600 font-semibold py-3 px-6 sm:px-8 rounded-lg transition-all duration-300 ${
                   isDark
                     ? "text-blue-400 hover:bg-blue-600 hover:text-white"
                     : "text-blue-600 hover:bg-blue-600 hover:text-white"
                 }`}
-                onClick={() => window.location.href = "/info"}
+                onClick={() => (window.location.href = "/info")}
               >
                 Ver Información
               </button>
@@ -151,11 +153,11 @@ function Presentation({ theme }) {
       </div>
 
       {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <h2 className={`text-3xl font-bold text-center mb-12 ${isDark ? "text-white" : "text-gray-900"}`}>
           ¿Por qué elegir nuestro sistema?
         </h2>
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
           {features.map((feature, index) => (
             <div
               key={index}
@@ -183,7 +185,7 @@ function Presentation({ theme }) {
           <h2 className={`text-3xl font-bold text-center mb-8 ${isDark ? "text-white" : "text-gray-900"}`}>
             Cómo Usar
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="text-center">
               <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">
                 1
@@ -235,33 +237,39 @@ function Presentation({ theme }) {
             <div className="flex items-center justify-between">
               <button
                 onClick={handlePrev}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-10"
+                className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white p-2 sm:p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-10"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
-              <div className="flex-1 mx-8">
+              <div className="flex-1 mx-4 sm:mx-8">
                 <div
-                  className={`rounded-xl p-8 shadow-inner ${
+                  className={`rounded-xl p-4 sm:p-8 shadow-inner ${
                     isDark ? "bg-gradient-to-r from-gray-700 to-gray-600" : "bg-gradient-to-r from-gray-50 to-blue-50"
                   }`}
                 >
-                  <div className="flex items-start space-x-6">
-                    <div className={`p-4 rounded-xl shadow-md ${isDark ? "bg-gray-800" : "bg-white"}`}>
+                  <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6">
+                    <div
+                      className={`p-3 sm:p-4 rounded-xl shadow-md ${isDark ? "bg-gray-800" : "bg-white"} mx-auto sm:mx-0`}
+                    >
                       {languages[currentIndex].icon}
                     </div>
-                    <div className="flex-1">
-                      <h3 className={`text-2xl font-bold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
+                    <div className="flex-1 text-center sm:text-left">
+                      <h3 className={`text-xl sm:text-2xl font-bold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
                         {languages[currentIndex].title}
                       </h3>
-                      <p className={`mb-4 leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                      <p
+                        className={`mb-4 leading-relaxed text-sm sm:text-base ${isDark ? "text-gray-300" : "text-gray-700"}`}
+                      >
                         {languages[currentIndex].description}
                       </p>
-                      <ul className="space-y-2">
+                      <ul className="space-y-2 text-left">
                         {languages[currentIndex].points.map((point, index) => (
                           <li key={index} className="flex items-start">
                             <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                            <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>{point}</span>
+                            <span className={`text-xs sm:text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                              {point}
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -272,9 +280,9 @@ function Presentation({ theme }) {
 
               <button
                 onClick={handleNext}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-10"
+                className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white p-2 sm:p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-10"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
@@ -298,15 +306,15 @@ function Presentation({ theme }) {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
-            <h2 className="text-3xl font-bold mb-4">¿Tienes alguna sugerencia o comentario?</h2>
-            <p className="text-xl mb-6 opacity-90">
+        <div className="text-center mt-12 sm:mt-16">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 sm:p-8 text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">¿Tienes alguna sugerencia o comentario?</h2>
+            <p className="text-lg sm:text-xl mb-6 opacity-90">
               Tu opinión es importante para mí. Ayúdame a mejorar el sistema con tus comentarios.
             </p>
-            <button 
-              className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-              onClick={() => window.location.href = "/feedback"}
+            <button
+              className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-6 sm:px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+              onClick={() => (window.location.href = "/feedback")}
             >
               Enviar Comentarios
             </button>

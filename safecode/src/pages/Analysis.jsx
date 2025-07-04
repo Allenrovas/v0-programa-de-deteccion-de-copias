@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { useDropzone } from "react-dropzone"
 import {
@@ -16,7 +14,7 @@ import {
   FileText,
   Info,
 } from "lucide-react"
-import api from "../service/api" 
+import api from "../service/api"
 
 function Analysis({ theme }) {
   const [language, setLanguage] = useState("")
@@ -194,7 +192,7 @@ function Analysis({ theme }) {
       >
         {/* Header */}
         <div className={`p-6 border-b ${isDark ? "border-gray-700 bg-gray-750" : "border-gray-200 bg-gray-50"}`}>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="flex items-center space-x-4">
               <GitCompare className="w-6 h-6 text-blue-500" />
               <div>
@@ -208,7 +206,7 @@ function Analysis({ theme }) {
             </div>
 
             {/* Similarity Badge */}
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:space-x-3">
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   pair.is_plagiarism
@@ -225,25 +223,29 @@ function Analysis({ theme }) {
           </div>
 
           {/* File Names */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className={`p-3 rounded-lg ${isDark ? "bg-blue-900/20" : "bg-blue-50"}`}>
               <FileText className="w-4 h-4 text-blue-500 mb-1" />
-              <p className={`font-medium ${isDark ? "text-blue-300" : "text-blue-700"}`}>{pair.file1.path}</p>
-              <p className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+              <p className={`font-medium break-words text-sm md:text-base ${isDark ? "text-blue-300" : "text-blue-700"}`}>
+                {pair.file1.path}
+              </p>
+              <p className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
                 {pair.file1.file_size} bytes • {pair.file1.token_count} tokens
               </p>
             </div>
             <div className={`p-3 rounded-lg ${isDark ? "bg-purple-900/20" : "bg-purple-50"}`}>
               <FileText className="w-4 h-4 text-purple-500 mb-1" />
-              <p className={`font-medium ${isDark ? "text-purple-300" : "text-purple-700"}`}>{pair.file2.path}</p>
-              <p className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+              <p className={`font-medium break-words text-sm md:text-base ${isDark ? "text-purple-300" : "text-purple-700"}`}>
+                {pair.file2.path}
+              </p>
+              <p className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
                 {pair.file2.file_size} bytes • {pair.file2.token_count} tokens
               </p>
             </div>
           </div>
 
           {/* Similarity Metrics */}
-          <div className="mt-4 grid grid-cols-3 gap-4">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className={`text-center p-2 rounded ${isDark ? "bg-gray-700" : "bg-gray-100"}`}>
               <p className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>Token Similarity</p>
               <p className={`text-lg font-bold ${getSimilarityColor(pair.token_similarity)}`}>
@@ -272,10 +274,10 @@ function Analysis({ theme }) {
               <h4 className={`font-medium ${isDark ? "text-white" : "text-gray-900"}`}>
                 Fragmentos Similares ({pair.similar_fragments.length})
               </h4>
-              <div className="flex space-x-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setViewMode("side-by-side")}
-                  className={`px-3 py-1 rounded text-sm ${
+                  className={`px-2 sm:px-3 py-1 rounded text-xs sm:text-sm ${
                     viewMode === "side-by-side"
                       ? "bg-blue-500 text-white"
                       : isDark
@@ -287,7 +289,7 @@ function Analysis({ theme }) {
                 </button>
                 <button
                   onClick={() => setViewMode("unified")}
-                  className={`px-3 py-1 rounded text-sm ${
+                  className={`px-2 sm:px-3 py-1 rounded text-xs sm:text-sm ${
                     viewMode === "unified"
                       ? "bg-blue-500 text-white"
                       : isDark
@@ -300,7 +302,7 @@ function Analysis({ theme }) {
               </div>
             </div>
 
-            <div className="flex space-x-2 overflow-x-auto">
+            <div className="flex flex-wrap gap-2 overflow-x-auto">
               {pair.similar_fragments.map((fragment, index) => (
                 <button
                   key={index}
@@ -324,7 +326,7 @@ function Analysis({ theme }) {
         {pair.similar_fragments && pair.similar_fragments.length > 0 && (
           <div className="p-6">
             {viewMode === "side-by-side" ? (
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* File 1 */}
                 <div className={`rounded-lg border ${isDark ? "border-gray-600" : "border-gray-300"}`}>
                   <div
@@ -379,7 +381,7 @@ function Analysis({ theme }) {
                     Vista Unificada - Fragmento {selectedFragment + 1}
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-0">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                   <div
                     className={`p-4 border-r ${isDark ? "border-gray-600 bg-blue-900/10" : "border-gray-300 bg-blue-50/50"}`}
                   >
@@ -432,7 +434,7 @@ function Analysis({ theme }) {
               : "bg-gradient-to-r from-blue-600/10 to-purple-600/10"
           }`}
         ></div>
-        <div className="relative max-w-7xl mx-auto px-6 py-16">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
               <Code2 className="w-12 h-12 text-blue-600 mr-4" />
@@ -444,14 +446,16 @@ function Analysis({ theme }) {
                 Detección de Similitudes
               </span>
             </div>
-            <h1 className={`text-4xl md:text-5xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}>
+            <h1
+              className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-900"}`}
+            >
               Análisis de{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Proyectos
               </span>
             </h1>
             <p
-              className={`text-xl mb-8 max-w-3xl mx-auto leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}
+              className={`text-lg sm:text-xl mb-8 max-w-3xl mx-auto leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}
             >
               Carga tus proyectos en formato ZIP y nuestro sistema analizará las similitudes entre ellos utilizando
               técnicas avanzadas de machine learning.
@@ -461,8 +465,8 @@ function Analysis({ theme }) {
       </div>
 
       {/* Analysis Form Section */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-3 gap-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-12">
           {/* Left Column - Instructions */}
           <div className="lg:col-span-1 space-y-8">
             <div
@@ -622,7 +626,7 @@ function Analysis({ theme }) {
                       {fileNames.map((name, index) => (
                         <li
                           key={index}
-                          className={`flex justify-between items-center p-3 rounded-lg ${
+                          className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 rounded-lg ${
                             isDark ? "bg-gray-800" : "bg-white"
                           }`}
                         >
@@ -679,7 +683,7 @@ function Analysis({ theme }) {
 
       {/* Results Section */}
       {analysisResults && (
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <h2 className={`text-3xl md:text-4xl font-bold mb-10 text-center ${isDark ? "text-white" : "text-gray-900"}`}>
             Resultados del Análisis
           </h2>
@@ -693,7 +697,7 @@ function Analysis({ theme }) {
                 <Info className="w-6 h-6 mr-3 text-blue-500" />
                 Estadísticas de Rendimiento
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                 <div className={`p-3 rounded-lg ${isDark ? "bg-gray-700" : "bg-gray-50"}`}>
                   <p className={`font-semibold ${isDark ? "text-green-400" : "text-green-600"}`}>
                     {analysisResults.performance_stats.total_time?.toFixed(2)}s

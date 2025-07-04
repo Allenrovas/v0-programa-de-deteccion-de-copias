@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { X, Upload, MessageSquare, ImageIcon, Send, CheckCircle, AlertCircle } from "lucide-react"
 
@@ -122,7 +120,7 @@ function Feedback({ theme }) {
                   <div>
                     <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>Mejora Continua</h3>
                     <p className={isDark ? "text-gray-300" : "text-gray-600"}>
-                      Tus comentarios nos ayudan a identificar áreas de mejora y nuevas funcionalidades.
+                      Tus comentarios me ayudan a identificar áreas de mejora y nuevas funcionalidades.
                     </p>
                   </div>
                 </div>
@@ -133,7 +131,7 @@ function Feedback({ theme }) {
                       Experiencia de Usuario
                     </h3>
                     <p className={isDark ? "text-gray-300" : "text-gray-600"}>
-                      Nos permite optimizar la interfaz y hacer el sistema más intuitivo.
+                      Me permite optimizar la interfaz y hacer el sistema más intuitivo.
                     </p>
                   </div>
                 </div>

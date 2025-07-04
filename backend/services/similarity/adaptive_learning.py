@@ -190,7 +190,7 @@ class AdaptivePlagiarismLearner:
             # Modelo no entrenado, usar regla simple
             combined = sum(features.values()) / len(features)
             return {
-                "is_plagiarism": combined > 0.7,
+                "is_plagiarism": combined > 0.6,
                 "probability": combined,
                 "method": "simple_average"
             }

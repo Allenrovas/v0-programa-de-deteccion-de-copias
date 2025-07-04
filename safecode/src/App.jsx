@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import NavBar from "./components/NavBar"

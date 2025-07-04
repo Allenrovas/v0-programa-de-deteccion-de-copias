@@ -1,5 +1,3 @@
-"use client"
-
 import { GraduationCap, Target, Globe, Lightbulb, Calendar, Mail, BookOpen, Code2, Brain, Award } from "lucide-react"
 
 const InfoCard = ({ icon: Icon, title, description, isDark, variant = "default" }) => {
@@ -218,7 +216,7 @@ function Info({ theme }) {
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
             <Mail className="w-12 h-12 mx-auto mb-4" />
             <h2 className="text-3xl font-bold mb-4">¿Tienes preguntas?</h2>
-            <p className="text-xl mb-6 opacity-90">Para más información sobre el proyecto, no dudes en contactarnos.</p>
+            <p className="text-xl mb-6 opacity-90">Para más información sobre el proyecto, no dudes en contactarme.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
                 href="mailto:2909080001301@ingenieria.usac.edu.gt"

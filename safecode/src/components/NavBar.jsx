@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Sun, Moon, Heart, Menu, X } from "lucide-react"
