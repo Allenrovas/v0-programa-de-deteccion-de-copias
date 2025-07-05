@@ -1,34 +1,27 @@
-# Usar Node.js como imagen base
-FROM node:18-alpine as build
+# ----------- BUILD STAGE -------------
+FROM node:18-alpine AS build
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar package.json y package-lock.json
+# Copiar solo los archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm ci --only=production
+# Instalar TODAS las dependencias (incluidas las dev)
+RUN npm ci
 
-# Copiar el código fuente
+# Copiar el resto del código
 COPY . .
 
-# Construir la aplicación
+# Ejecutar build
 RUN npm run build
 
-# Etapa de producción - usar Node.js para servir archivos estáticos
-FROM node:18-alpine as production
+# ----------- PRODUCTION STAGE -------------
+FROM nginx:alpine AS production
 
-WORKDIR /app
+# Copiar archivos estáticos al servidor Nginx
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Instalar serve globalmente para servir archivos estáticos
-RUN npm install -g serve
+# Exponer el puerto 80
+EXPOSE 80
 
-# Copiar los archivos construidos desde la etapa de build
-COPY --from=build /app/dist ./dist
-
-# Exponer el puerto (Cloud Run usa la variable PORT)
-EXPOSE 8080
-
-# Comando para iniciar la aplicación
-CMD ["serve", "-s", "dist", "-l", "8080"]
+CMD ["nginx", "-g", "daemon off;"]
