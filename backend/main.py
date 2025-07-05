@@ -1,7 +1,7 @@
 # Punto de entrada de la API
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import upload, ground_truth, adaptive_learning
+from routers import upload, ground_truth, adaptive_learning, feedback
 
 app = FastAPI(
     title="Detector de Copias",
@@ -22,6 +22,7 @@ app.add_middleware(
 app.include_router(upload.router)
 app.include_router(ground_truth.router)
 app.include_router(adaptive_learning.router)
+app.include_router(feedback.router)
 
 @app.get("/")
 async def root():

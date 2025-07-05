@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { X, Upload, MessageSquare, ImageIcon, Send, CheckCircle, AlertCircle } from "lucide-react"
+import { X, Upload, MessageSquare, ImageIcon, Send, CheckCircle, AlertCircle, TestTube } from "lucide-react"
+import api from "../service/api"
 
 function Feedback({ theme }) {
   const [comment, setComment] = useState("")
@@ -18,19 +19,38 @@ function Feedback({ theme }) {
 
   const handleImageChange = (event) => {
     const selectedImages = Array.from(event.target.files)
-    setImages((prevImages) => [...prevImages, ...selectedImages])
 
-    const previews = selectedImages.map((image) => URL.createObjectURL(image))
-    setImagePreviews((prevPreviews) => [...prevPreviews, ...previews])
+    // Validar tamaño de archivos (máximo 10MB cada uno)
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    const validImages = selectedImages.filter((image) => {
+      if (image.size > maxSize) {
+        setModalMessage(`La imagen "${image.name}" es demasiado grande. El tamaño máximo es 10MB.`)
+        setModalType("error")
+        setIsModalOpen(true)
+        return false
+      }
+      return true
+    })
+
+    if (validImages.length > 0) {
+      setImages((prevImages) => [...prevImages, ...validImages])
+
+      const previews = validImages.map((image) => URL.createObjectURL(image))
+      setImagePreviews((prevPreviews) => [...prevPreviews, ...previews])
+    }
   }
 
   const handleRemoveImage = (index) => {
+    // Liberar URL del objeto para evitar memory leaks
+    URL.revokeObjectURL(imagePreviews[index])
+
     setImages((prevImages) => prevImages.filter((_, i) => i !== index))
     setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+
     if (!comment.trim()) {
       setModalMessage("Por favor, escribe un comentario antes de enviar.")
       setModalType("error")
@@ -40,18 +60,64 @@ function Feedback({ theme }) {
 
     setIsSubmitting(true)
 
-    // Simular envío
-    setTimeout(() => {
-      console.log("Comentario:", comment)
-      console.log("Imágenes:", images)
-      setModalMessage("¡Gracias por tu retroalimentación! Hemos recibido tu comentario correctamente.")
-      setModalType("success")
+    try {
+      // Crear FormData para enviar archivos
+      const formData = new FormData()
+      formData.append("message", comment.trim())
+
+      // Agregar imágenes al FormData
+      images.forEach((image, index) => {
+        formData.append("images", image)
+      })
+
+      const response = await api.post("/feedback/send", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      if (response.data.success) {
+        setModalMessage(
+          `¡Gracias por tu retroalimentación, ${name}! Hemos recibido tu comentario correctamente${
+            images.length > 0 ? ` junto con ${images.length} imagen(es)` : ""
+          }. Te contactaremos pronto a ${email}.`,
+        )
+        setModalType("success")
+        setIsModalOpen(true)
+
+        // Limpiar formulario
+        setComment("")
+        setEmail("")
+        setName("")
+
+        // Liberar URLs de objetos antes de limpiar
+        imagePreviews.forEach((url) => URL.revokeObjectURL(url))
+        setImages([])
+        setImagePreviews([])
+      } else {
+        throw new Error(response.data.message || "Error desconocido")
+      }
+    } catch (error) {
+      console.error("Error enviando feedback:", error)
+      let errorMessage = "Hubo un error al enviar tu mensaje. Por favor, intenta nuevamente."
+
+      // Manejo de errores
+      if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      } else if (error.code === "NETWORK_ERROR") {
+        errorMessage = "No se pudo conectar con el servidor. Verifica tu conexión a internet."
+      }
+
+      setModalMessage(errorMessage)
+      setModalType("error")
       setIsModalOpen(true)
-      setComment("")
-      setImages([])
-      setImagePreviews([])
+    } finally {
       setIsSubmitting(false)
-    }, 2000)
+    }
   }
 
   const closeModal = () => {
@@ -187,7 +253,7 @@ function Feedback({ theme }) {
                   rows="6"
                 />
                 <div className={`text-xs mt-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-                  {comment.length}/500 caracteres
+                  {comment.length}/1000 caracteres
                 </div>
               </div>
 
@@ -240,6 +306,11 @@ function Feedback({ theme }) {
                       >
                         <X className="w-4 h-4" />
                       </button>
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 rounded-b-lg ${isDark ? "text-gray-200" : "text-white"}`}
+                      >
+                        {images[index]?.name}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -261,6 +332,11 @@ function Feedback({ theme }) {
                   <div className="flex items-center justify-center">
                     <Send className="w-5 h-5 mr-2" />
                     Enviar Feedback
+                    {images.length > 0 && (
+                      <span className="ml-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                        +{images.length} img
+                      </span>
+                    )}
                   </div>
                 )}
               </button>
