@@ -78,17 +78,15 @@ function Feedback({ theme }) {
 
       if (response.data.success) {
         setModalMessage(
-          `¡Gracias por tu retroalimentación, ${name}! Hemos recibido tu comentario correctamente${
-            images.length > 0 ? ` junto con ${images.length} imagen(es)` : ""
-          }. Te contactaremos pronto a ${email}.`,
+          images.length === 0
+            ? "¡Gracias por tu retroalimentación! Hemos recibido tu comentario correctamente"
+            : `¡Gracias por tu retroalimentación! Hemos recibido tu comentario correctamente junto con ${images.length} ${images.length === 1 ? "imagen" : "imágenes"}`
         )
         setModalType("success")
         setIsModalOpen(true)
 
         // Limpiar formulario
         setComment("")
-        setEmail("")
-        setName("")
 
         // Liberar URLs de objetos antes de limpiar
         imagePreviews.forEach((url) => URL.revokeObjectURL(url))

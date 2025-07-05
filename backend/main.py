@@ -2,6 +2,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import upload, ground_truth, adaptive_learning, feedback
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(
     title="Detector de Copias",

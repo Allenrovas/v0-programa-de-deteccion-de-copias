@@ -41,16 +41,16 @@ async def send_feedback(
         # Cuerpo del email
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         body = f"""
-            Nuevo feedback recibido en SafeCode:
+        Nuevo feedback recibido en SafeCode:
 
-            Fecha: {timestamp}
+        Fecha: {timestamp}
 
-            Mensaje:
-            {message}
+        Mensaje:
+        {message}
 
-            ---
-            Este mensaje fue enviado desde el sistema SafeCode de detección de copias.
-            Proyecto de graduación - USAC FIUSAC ECYS
+        ---
+        Este mensaje fue enviado desde el sistema SafeCode de detección de copias.
+        Proyecto de graduación - USAC FIUSAC ECYS
         """
         
         # Adjuntar el cuerpo del mensaje
