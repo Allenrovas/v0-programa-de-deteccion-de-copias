@@ -32,26 +32,27 @@ app.include_router(feedback.router)
 async def root():
     return {"message": "Bienvenido al API de Detección de Copias", "ssl_enabled": True}
 
+# Configuración SSL global
+ssl_context = None
+cert_file = "/etc/ssl/certs/server.crt"
+key_file = "/etc/ssl/private/server.key"
+
+if os.path.exists(cert_file) and os.path.exists(key_file):
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context.load_cert_chain(cert_file, key_file)
+    port = 8443
+else:
+    port = 8000
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "ssl": True if ssl_context else False}
 
 if __name__ == "__main__":
-    # Configuración SSL
-    ssl_context = None
-    
-    # Verificar si existen certificados SSL
-    cert_file = "/etc/ssl/certs/server.crt"
-    key_file = "/etc/ssl/private/server.key"
-    
-    if os.path.exists(cert_file) and os.path.exists(key_file):
-        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        ssl_context.load_cert_chain(cert_file, key_file)
+    if ssl_context:
         print("SSL habilitado")
-        port = 8443
     else:
         print("Ejecutando sin SSL en puerto 8000")
-        port = 8000
     
     uvicorn.run(
         "main:app",
