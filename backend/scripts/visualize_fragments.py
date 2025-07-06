@@ -336,7 +336,7 @@ def visualize_fragments(results_file, output_dir, language):
         </head>
         <body>
             <div class="header">
-                <h1>etup-ssl.shDetector de Similitudes de Código</h1>
+                <h1>Detector de Similitudes de Código</h1>
                 <p>Visualización avanzada de fragmentos similares - Lenguaje: <strong>{language}</strong></p>
             </div>
         """)
