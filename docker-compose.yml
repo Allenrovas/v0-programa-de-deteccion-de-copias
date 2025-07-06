@@ -1,23 +1,31 @@
 services:
-  # Backend service
+  # Backend service with SSL support
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: safecode-backend
     ports:
-      - "8000:8000"
+      - "8000:8000"   # HTTP
+      - "8443:8443"   # HTTPS
     environment:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
+      - ENABLE_SSL=true
+      - SSL_METHOD=selfsigned
     env_file:
       - ./backend/.env
     volumes:
       - ./backend:/app
+      - ssl_certs:/etc/ssl/certs
+      - ssl_keys:/etc/ssl/private
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test: ["CMD", "curl", "-f", "-k", "https://localhost:8443/"]
       interval: 30s
       timeout: 10s
       retries: 3
 
+volumes:
+  ssl_certs:
+  ssl_keys:
